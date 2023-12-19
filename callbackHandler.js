@@ -2,12 +2,12 @@ const keys = require("./keys");
 const callbackHandler = {
     services (callbackQuery, bot, group_id) {
         const chatId = callbackQuery.message.chat.id;
-        const userId = callbackQuery.from.id;
+        const userName = callbackQuery.from.username;
         const messageId = callbackQuery.message.message_id; // ID сообщения, которое нужно отредактировать
         const serviceName = callbackQuery.data;
         // Отправляем сообщение в группу с информацией о покупке
-        const message = `Пользователь @${callbackQuery.from.username} хочет купить услугу: ${serviceName}`;
-
+        const message = `Пользователь @${userName} хочет купить услугу: ${serviceName}`;
+        console.log(callbackQuery)
         // Отправляем сообщение в группу
         bot.sendMessage(group_id, message);
 
