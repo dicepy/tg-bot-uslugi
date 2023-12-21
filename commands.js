@@ -1,20 +1,15 @@
+const data = require("./staticData");
+
+
 const commands = {
     sendServicesMessage (chatId, bot) {
-        const services = [
-            { name: 'Услуга 1', description: 'Описание услуги 1' },
-            { name: 'Услуга 2', description: 'Описание услуги 2' },
-        ];
-
-        const keyboard = {
-            inline_keyboard: services.map((service) => [
-                { text: service.name, callback_data: service.name },
-            ]),
-        };
-
-        const message = 'Выберите услугу:';
-        bot.sendMessage(chatId, message, { reply_markup: keyboard });
+        const message = data.serviceName;
+        bot.sendMessage(chatId, message, { reply_markup: data.servicesKeyboard });
     },
-
+    sendMenu (chatId, bot) {
+        const message = data.menuName;
+        bot.sendMessage(chatId, message, { reply_markup: data.menuKeyboard });
+    }
 }
 
 module.exports = commands

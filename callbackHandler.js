@@ -1,21 +1,47 @@
 const keys = require("./keys");
+const commands = require("./commands");
+const data = require("./staticData");
 const callbackHandler = {
     services (callbackQuery, bot, group_id) {
-        const chatId = callbackQuery.message.chat.id;
-        const userName = callbackQuery.from.username;
-        const messageId = callbackQuery.message.message_id; // ID сообщения, которое нужно отредактировать
-        const serviceName = callbackQuery.data;
-        // Отправляем сообщение в группу с информацией о покупке
-        const message = `Пользователь @${userName} хочет купить услугу: ${serviceName}`;
-        console.log(callbackQuery)
-        // Отправляем сообщение в группу
+        const message = `Пользователь @${callbackQuery.from.username} хочет купить услугу: ${callbackQuery.data}`;
         bot.sendMessage(group_id, message);
-
-        // Редактируем сообщение пользователя, удаляя клавиатуру
-        bot.editMessageText(`Спасибо за покупку услуги: ${serviceName}. Ожидайте дальнейших инструкций.`, {
-            chat_id: chatId,
-            message_id: messageId,
-            reply_markup: { inline_keyboard: [] }
+        bot.editMessageText(data.thxText, {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id,
+            reply_markup: data.backMenuKeyboard
+        });
+    },
+    menu (callbackQuery,bot){
+        const optionName = callbackQuery.data;
+        switch (optionName){
+            case data.menuService:
+                bot.editMessageText(data.serviceName, {
+                    chat_id: callbackQuery.message.chat.id,
+                    message_id: callbackQuery.message.message_id,
+                    reply_markup: data.servicesKeyboard
+                });
+                break;
+            case data.menuInfo:
+                bot.editMessageText(data.infoText, {
+                    chat_id: callbackQuery.message.chat.id,
+                    message_id: callbackQuery.message.message_id,
+                    reply_markup: data.backMenuKeyboard
+                });
+                break;
+            case data.menuChannel:
+                bot.editMessageText(data.channelText, {
+                    chat_id: callbackQuery.message.chat.id,
+                    message_id: callbackQuery.message.message_id,
+                    reply_markup: data.backMenuKeyboard
+                });
+                break;
+        }
+    },
+    back (callbackQuery,bot) {
+        bot.editMessageText(data.menuName, {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id,
+            reply_markup: data.menuKeyboard
         });
     }
 }

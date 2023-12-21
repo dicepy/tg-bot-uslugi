@@ -3,6 +3,7 @@ const checkUser = require("./checkUser");
 const keys = require("./keys");
 const commands = require("./commands");
 const callbackHandler = require("./callbackHandler");
+const data = require("./staticData");
 
 const bot = new TelegramBot(keys.TOKEN, { polling: true });
 
@@ -30,22 +31,7 @@ bot.on('message', (msg) => {
         checkUser(keys.CHANNEL_ID, userId, bot)
             .then((status) => {
                 if (status) {
-                    switch (msg.text) {
-                        case '/start':
-                            bot.sendMessage(chatId, `Приветствие`);
-                            break;
-                        case '/info':
-                            bot.sendMessage(chatId, `Здесь какая-то информация`);
-                            break;
-                        case '/services':
-                            commands.sendServicesMessage(chatId, bot);
-                            break;
-                        case '/channel':
-                            bot.sendMessage(chatId, `Ссылка на наш канал ${keys.INVITE}`);
-                            break;
-                        default:
-                            bot.sendMessage(chatId, `Неизвестная команда, используйте меню`);
-                    }
+                    commands.sendMenu(chatId, bot)
                 } else {
                     bot.sendMessage(chatId, `Чтобы воспользоваться ботом, подпишитесь на наш канал. ${keys.INVITE}`);
                 }
@@ -60,8 +46,20 @@ bot.on('message', (msg) => {
 
 bot.on('callback_query', (callbackQuery) => {
     switch (callbackQuery.message.text) {
-        case "Выберите услугу:":
-            callbackHandler.services(callbackQuery, bot, keys.GROUP_ID);
+        case data.serviceName:
+            if (callbackQuery.data === data.backMenuName){
+                callbackHandler.back(callbackQuery,bot);
+            } else{
+                callbackHandler.services(callbackQuery, bot, keys.GROUP_ID);
+            }
+            break;
+        case data.menuName:
+            callbackHandler.menu(callbackQuery,bot);
+            break;
+        case data.infoText:
+        case data.channelText:
+        case data.thxText:
+            callbackHandler.back(callbackQuery,bot);
             break;
     }
 });
