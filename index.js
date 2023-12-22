@@ -7,7 +7,7 @@ const data = require("./staticData");
 
 const bot = new TelegramBot(keys.TOKEN, { polling: true });
 
-const sendServicesMessage = commands.sendServicesMessage;
+const sendServicesMessage = commands.sendServices;
 
 // Очередь сообщений для предотвращения спама
 const messageQueue = new Map();
@@ -31,7 +31,23 @@ bot.on('message', (msg) => {
         checkUser(keys.CHANNEL_ID, userId, bot)
             .then((status) => {
                 if (status) {
-                    commands.sendMenu(chatId, bot)
+                    switch (msg.text){
+                        case data.botCommands.menu:
+                            commands.sendMenu(chatId, bot)
+                            break;
+                        case data.botCommands.services:
+                            commands.sendServices(chatId,bot)
+                            break;
+                        case data.botCommands.info:
+                            commands.sendInfo(chatId,bot)
+                            break;
+                        case data.botCommands.channel:
+                            commands.sendChannel(chatId,bot)
+                            break;
+                        case data.botCommands.start:
+                            commands.sendStart(chatId, bot)
+                            break;
+                    }
                 } else {
                     bot.sendMessage(chatId, `Чтобы воспользоваться ботом, подпишитесь на наш канал. ${keys.INVITE}`);
                 }
