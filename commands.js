@@ -1,26 +1,28 @@
-const data = require("./staticData");
+const staticData = require("./data/staticData");
+const {GROUP_ID} = require("./data/keys");
 
 
 const commands = {
     sendServices (chatId, bot) {
-        const message = data.serviceName;
-        bot.sendMessage(chatId, message, { reply_markup: data.servicesKeyboard });
+        const message = staticData.servicesName;
+        bot.sendMessage(chatId, message, { reply_markup: staticData.servicesKeyboard });
     },
     sendMenu (chatId, bot) {
-        const message = data.menuName;
-        bot.sendMessage(chatId, message, { reply_markup: data.menuKeyboard });
-    },
-    sendChannel (chatId, bot) {
-        const message = data.channelText;
-        bot.sendMessage(chatId, message, { reply_markup: data.backMenuKeyboard });
+        const message = staticData.menuName;
+        bot.sendMessage(chatId, message, { reply_markup: staticData.menuKeyboard });
     },
     sendInfo (chatId, bot) {
-        const message = data.infoText;
-        bot.sendMessage(chatId, message, { reply_markup: data.backMenuKeyboard });
+        const message = staticData.infoText;
+        bot.sendMessage(chatId, message, { reply_markup: staticData.backMenuKeyboard });
     },
-    sendStart (chatId, bot) {
-        const message = data.startText;
-        bot.sendMessage(chatId, message, { reply_markup: data.backMenuKeyboard });
+    sendNoCommand (chatId, bot){
+        const message = staticData.noCommandText;
+        bot.sendMessage(chatId, message, { reply_markup: staticData.backMenuKeyboard });
+    },
+    sendAcquiringForm (msg, bot) {
+        const message = `Пользователь @${msg.from.username} оставил заявку на ${staticData.servicesCommands.acquiring}\n${msg.text}
+        `;
+        bot.sendMessage(GROUP_ID, message);
     }
 }
 
