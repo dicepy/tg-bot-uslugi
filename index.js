@@ -17,7 +17,7 @@ const chechAgree = (agreementQueue, userId) => {
 }
 
 bot.on('message', (msg) => {
-    console.log(msg)
+    // console.log(msg)
     const chatId = msg.chat.id;
     const userId = msg.from.id;
     try {
@@ -73,7 +73,7 @@ bot.on('message', (msg) => {
 });
 
 bot.on('callback_query', (callbackQuery) => {
-    console.log(callbackQuery)
+    // console.log(callbackQuery)
     checkUser(keys.CHANNEL_ID_1,keys.CHANNEL_ID_2, callbackQuery.from.id, bot)
         .then((status) => {
             if (status) {
