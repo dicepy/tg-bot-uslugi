@@ -19,8 +19,8 @@ const commands = {
         const message = staticData.noCommandText;
         bot.sendMessage(chatId, message, { reply_markup: staticData.backMenuKeyboard });
     },
-    sendAcquiringForm (msg, bot) {
-        const message = `Пользователь @${msg.from.username} оставил заявку на ${staticData.servicesCommands.acquiring}\n${msg.text}
+    sendForm (msg, bot, service) {
+        const message = `Пользователь @${msg.from.username} оставил заявку на ${service}\n${msg.text}
         `;
         bot.sendMessage(GROUP_ID, message);
     }

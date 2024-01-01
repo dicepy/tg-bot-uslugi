@@ -25,25 +25,6 @@ const callbacks = {
                 });
                 break;
             case staticData.servicesCommands.merch:
-                bot.editMessageText(staticData.servicesCommands.merch, {
-                    chat_id: callbackQuery.message.chat.id,
-                    message_id: callbackQuery.message.message_id,
-                    reply_markup: {
-                        inline_keyboard: [
-                            ...availableServices.merch.map(item => [
-                                { text: item, callback_data: item }
-                            ]),
-                            ...staticData.prevList.map(service => [
-                                { text: service.name, callback_data: service.name }
-                            ]),
-                            ...staticData.backMenuList.map(service => [
-                                { text: service.name, callback_data: service.name }
-                            ])
-                        ]
-                    }
-
-                });
-                break;
             case staticData.servicesCommands.acquiring:
                 bot.editMessageText(staticData.agreementText, {
                     chat_id: callbackQuery.message.chat.id,
@@ -95,16 +76,7 @@ const callbacks = {
             reply_markup: staticData.backMenuKeyboard
         });
     },
-    merch (callbackQuery,bot, group_id) {
-        const message = `Пользователь @${callbackQuery.from.username} оставил заявку на ${staticData.servicesCommands.merch}: ${callbackQuery.data}`;
-        bot.sendMessage(group_id, message);
-        bot.editMessageText(staticData.thxText, {
-            chat_id: callbackQuery.message.chat.id,
-            message_id: callbackQuery.message.message_id,
-            reply_markup: staticData.backMenuKeyboard
-        });
-    },
-    acquiring (callbackQuery,bot){
+    form (callbackQuery,bot){
         bot.editMessageText(staticData.formText, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,

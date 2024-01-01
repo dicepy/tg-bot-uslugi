@@ -2,19 +2,20 @@ const TelegramBot = require('node-telegram-bot-api');
 const checkUser = require("./checkUser");
 const keys = require("./data/keys");
 const commands = require("./commands");
-const callbackHandler = require("./callbacks");
+const callbacks = require("./callbacks");
 const staticData = require("./data/staticData");
 
 const bot = new TelegramBot(keys.TOKEN, { polling: true });
 
 const messageQueue = new Map();
 const agreementQueue = new Map();
-
-const chechAgree = (agreementQueue, userId) => {
-    if (agreementQueue.has(userId)) {
-        agreementQueue.delete(userId)
+const serviceQueue = new Map();
+const check = (Queue, userId) => {
+    if (Queue.has(userId)) {
+        Queue.delete(userId)
     }
 }
+
 
 bot.on('message', (msg) => {
     // console.log(msg)
@@ -38,22 +39,26 @@ bot.on('message', (msg) => {
                         switch (msg.text){
                             case staticData.botCommands.menu:
                             case staticData.botCommands.start:
-                                chechAgree(agreementQueue, userId)
+                                check(agreementQueue, userId)
+                                check(serviceQueue, userId)
                                 commands.sendMenu(chatId, bot)
                                 break;
                             case staticData.botCommands.services:
-                                chechAgree(agreementQueue, userId)
+                                check(agreementQueue, userId)
+                                check(serviceQueue, userId)
                                 commands.sendServices(chatId,bot)
                                 break;
                             case staticData.botCommands.info:
-                                chechAgree(agreementQueue, userId)
+                                check(agreementQueue, userId)
+                                check(serviceQueue, userId)
                                 commands.sendInfo(chatId,bot)
                                 break;
                             default:
                                 if (agreementQueue.has(userId)){
-                                    commands.sendAcquiringForm(msg, bot)
+                                    commands.sendForm(msg, bot, serviceQueue.get(userId))
                                     bot.sendMessage(chatId,staticData.thxText)
                                     agreementQueue.delete(userId)
+                                    serviceQueue.delete(userId)
                                     commands.sendMenu(chatId,bot)
                                 } else {
                                     commands.sendNoCommand(chatId,bot)
@@ -80,57 +85,54 @@ bot.on('callback_query', (callbackQuery) => {
                 switch (callbackQuery.message.text) {
                     case staticData.servicesName:
                         if (callbackQuery.data === staticData.backMenuName){
-                            callbackHandler.backToMenu(callbackQuery,bot);
+                            callbacks.backToMenu(callbackQuery,bot);
                         } else{
-                            callbackHandler.services(callbackQuery, bot, keys.GROUP_ID);
+                            serviceQueue.set(callbackQuery.from.id, callbackQuery.data)
+                            callbacks.services(callbackQuery, bot);
                         }
                         break;
                     case staticData.menuName:
-                        callbackHandler.menu(callbackQuery,bot);
+                        callbacks.menu(callbackQuery,bot);
                         break;
                     case staticData.servicesCommands.accsGeo:
+                        check(serviceQueue, callbackQuery.from.id)
                         if (callbackQuery.data === staticData.backMenuName){
-                            callbackHandler.backToMenu(callbackQuery,bot);
+                            callbacks.backToMenu(callbackQuery,bot);
                         } else if (callbackQuery.data === staticData.prevName) {
-                            callbackHandler.backToServices(callbackQuery, bot)
+                            callbacks.backToServices(callbackQuery, bot)
                         } else {
-                            callbackHandler.accsGeo(callbackQuery, bot, keys.GROUP_ID)
-                        }
-                        break;
-                    case staticData.servicesCommands.merch:
-                        if (callbackQuery.data === staticData.backMenuName){
-                            callbackHandler.backToMenu(callbackQuery,bot);
-                        } else if (callbackQuery.data === staticData.prevName) {
-                            callbackHandler.backToServices(callbackQuery, bot)
-                        }else{
-                            callbackHandler.merch(callbackQuery, bot, keys.GROUP_ID)
+                            callbacks.accsGeo(callbackQuery, bot, keys.GROUP_ID)
                         }
                         break;
                     case staticData.agreementText:
                         if (callbackQuery.data === staticData.backMenuName){
-                            callbackHandler.backToMenu(callbackQuery,bot);
+                            check(agreementQueue,callbackQuery.from.id)
+                            callbacks.backToMenu(callbackQuery,bot);
                         } else if (callbackQuery.data === staticData.prevName) {
-                            callbackHandler.backToServices(callbackQuery, bot)
+                            check(agreementQueue,callbackQuery.from.id)
+                            callbacks.backToServices(callbackQuery, bot)
                         }else{
-                            agreementQueue.set(callbackQuery.from.id, 1);
-                            callbackHandler.acquiring(callbackQuery, bot, keys.GROUP_ID)
+                            agreementQueue.set(callbackQuery.from.id, 1)
+                            callbacks.form(callbackQuery, bot, keys.GROUP_ID)
                         }
                         break;
                     case staticData.formText:
                         if (callbackQuery.data === staticData.backMenuName){
-                            chechAgree(agreementQueue, callbackQuery.from.id)
-                            callbackHandler.backToMenu(callbackQuery,bot);
+                            check(serviceQueue, callbackQuery.from.id)
+                            check(agreementQueue, callbackQuery.from.id)
+                            callbacks.backToMenu(callbackQuery,bot);
                         } else if (callbackQuery.data === staticData.prevName) {
-                            chechAgree(agreementQueue, callbackQuery.from.id)
-                            callbackHandler.backToServices(callbackQuery, bot)
+                            check(serviceQueue, callbackQuery.from.id)
+                            check(agreementQueue, callbackQuery.from.id)
+                            callbacks.backToServices(callbackQuery, bot)
                         }else {
-                            callbackHandler.backToMenu(callbackQuery,bot);
+                            callbacks.backToMenu(callbackQuery,bot);
                         }
                         break;
                     case staticData.noCommandText:
                     case staticData.infoText:
                     case staticData.thxText:
-                        callbackHandler.backToMenu(callbackQuery,bot);
+                        callbacks.backToMenu(callbackQuery,bot);
                         break;
                 }
             } else {
